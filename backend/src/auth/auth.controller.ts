@@ -44,11 +44,11 @@ export class AuthController {
 
       // redirect to frontend with accessToken
       return res.redirect(
-        `http://localhost:3000/auth?access_token=${data.access_token}&id_token=${data.id_token}&redirect_uri=${query.redirect_uri}`,
+        `${process.env.BASE_URL}/auth?access_token=${data.access_token}&id_token=${data.id_token}&redirect_uri=${query.redirect_uri}`,
       );
     } catch (err) {
       console.log(err);
-      return res.redirect('http://localhost:3000/auth?error=invalid_code');
+      return res.redirect(`${process.env.BASE_URL}/auth?error=invalid_code`);
     }
   }
 

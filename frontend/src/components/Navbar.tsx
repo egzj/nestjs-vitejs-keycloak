@@ -3,8 +3,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import { Link, useNavigate } from "react-router-dom"
 import { Button } from "../components/ui/button"
 
-type Props = {}
-const Navbar = (props: Props) => {
+const Navbar = () => {
   const { auth, setAuth, isAuthLoading } = useAuth()
   const axios = useAxiosPrivate()
   const navigate = useNavigate()

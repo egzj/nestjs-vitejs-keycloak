@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as Joi from 'joi';
+import { join } from 'path';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { KeycloakModule } from './keycloak/keycloak.module';
-import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
-import * as Joi from 'joi';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import * as Joi from 'joi';
         REFRESH_TOKEN_SECRET: Joi.string(),
       }),
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../', 'build'),
     }),
     AuthModule,
     KeycloakModule,

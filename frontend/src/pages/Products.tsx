@@ -1,11 +1,10 @@
 import Navbar from "@/components/Navbar"
 import useAxiosPrivate from "../hooks/useAxiosPrivate"
 import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Table } from "@/components/ui/table"
 
-type Props = {}
-const Products = (props: Props) => {
+const Products = () => {
   const axios = useAxiosPrivate()
   const navigate = useNavigate()
   const [products, setProducts] = useState([])

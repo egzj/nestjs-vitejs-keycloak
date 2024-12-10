@@ -2,9 +2,8 @@ import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import useAuth from "../hooks/useAuth"
 
-type Props = {}
-const Auth = (props: Props) => {
-  const { auth, setAuth, setIsAuthLoading } = useAuth()
+const Auth = () => {
+  const { setAuth, setIsAuthLoading } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
