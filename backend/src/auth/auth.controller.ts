@@ -9,9 +9,24 @@ import { API_PREFIX, REFRESH_TOKEN_COOKIE_KEY } from '../constant';
 export class AuthController {
   constructor(private keycloakService: KeycloakService) {}
 
+  /*
+    Sample response
+    {
+      redirect_uri: 'http://localhost:3000/products',
+      session_state: '4c72304a-f445-47a8-b96c-58670e514e46',
+      iss: 'http://localhost:8081/realms/sgp',
+      code: 'e6b97542-eba6-4e10-a669-c439fca944a6.4c72304a-f445-47a8-b96c-58670e514e46.48b6b587-6365-4faf-ac1f-27e2c12413ae'
+    }
+  */
   @Get('callback')
   async callback(
-    @Query() query: { code: string; redirect_uri: string },
+    @Query()
+    query: {
+      code: string;
+      redirect_uri: string;
+      session_state: string;
+      iss: string;
+    },
     @Res() res: Response,
   ) {
     try {

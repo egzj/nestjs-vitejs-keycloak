@@ -1,6 +1,7 @@
-import { Injectable, UseGuards } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import * as bcrypt from 'bcrypt';
 import {
   EnvironmentVariables,
   KeycloakRefreshSuccessResponse,
@@ -19,6 +20,14 @@ export class KeycloakService {
     this.clientId = this.configService.get('KEYCLOAK_CLIENT_ID');
     this.clientSecret = this.configService.get('KEYCLOAK_CLIENT_SECRET');
   }
+
+  /**
+   * NOTE: @keycloak/keycloak-admin-client in nestjs
+   * https://github.com/nestjs/nest/issues/7021
+   * https://github.com/keycloak/keycloak-nodejs-admin-client/issues/523
+   */
+  private dynamicKeycloakImport = async () =>
+    new Function("return import('@keycloak/keycloak-admin-client')")();
 
   async requestTokensUsingCode(code: string, redirectUri: string) {
     const { data } = await axios.post<KeycloakRefreshSuccessResponse>(
@@ -79,5 +88,64 @@ export class KeycloakService {
     );
 
     return data;
+  }
+
+  async getCustomers() {
+    const KCadmCli = (await this.dynamicKeycloakImport()).default;
+    const kcAdminClient = new KCadmCli({
+      baseUrl: this.kcUrl,
+      realmName: this.realm,
+    });
+    await kcAdminClient.auth({
+      grantType: 'client_credentials',
+      clientId: this.clientId,
+      clientSecret: this.clientSecret,
+      scopes: ['openid'],
+    });
+    const users = await kcAdminClient.users.find();
+    return users;
+  }
+
+  async insertUser(user: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phoneNo?: string;
+  }) {
+    const KCadmCli = (await this.dynamicKeycloakImport()).default;
+    const kcAdminClient = new KCadmCli({
+      baseUrl: this.kcUrl,
+      realmName: this.realm,
+    });
+    await kcAdminClient.auth({
+      grantType: 'client_credentials',
+      clientId: this.clientId,
+      clientSecret: this.clientSecret,
+    });
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(user.password, salt);
+
+    const newUser = {
+      credentials: [
+        {
+          algorithm: 'bcrypt',
+          hashedSaltedValue: hashedPassword,
+          hashIterations: 10,
+          type: 'password',
+        },
+      ],
+      email: user.email,
+      username: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      attributes: {
+        ...(user.phoneNo && { phoneNo: user.phoneNo }),
+      },
+      emailVerified: true,
+      enabled: true,
+    };
+    return await kcAdminClient.users.create(newUser);
   }
 }
