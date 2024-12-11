@@ -37,7 +37,7 @@ export class KeycloakService {
         client_secret: this.clientSecret,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `http://localhost:5000/api/v1/auth/callback?redirect_uri=${redirectUri}`,
+        redirect_uri: `${process.env.BASE_URL}/api/v1/auth/callback?redirect_uri=${redirectUri}`,
       },
       {
         headers: {
