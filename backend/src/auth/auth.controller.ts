@@ -44,11 +44,13 @@ export class AuthController {
 
       // redirect to frontend with accessToken
       return res.redirect(
-        `${process.env.BASE_URL}/auth?access_token=${data.access_token}&id_token=${data.id_token}&redirect_uri=${query.redirect_uri}`,
+        `${process.env.FRONTEND_URL}/auth?access_token=${data.access_token}&id_token=${data.id_token}&redirect_uri=${query.redirect_uri}`,
       );
     } catch (err) {
       console.log(err);
-      return res.redirect(`${process.env.BASE_URL}/auth?error=invalid_code`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/auth?error=invalid_code`,
+      );
     }
   }
 
